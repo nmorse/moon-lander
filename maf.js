@@ -239,7 +239,7 @@ function updateState(deltaT, elapsedT) {
     drawScene(deltaT, elapsedT);
 }
 
-const newcircle = () => {
+const new_circle = () => {
     queue.dequeue()
     const x = lx + (Math.random() * 100 - 50)
     const y = ly + (Math.random() * 100 - 50)
