@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/icon192x192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color">
+    <link rel="manifest" href="/manifest.json">
+    <script src="invoke-sw.js" />
     <style>
         body {
             margin: 0;
@@ -17,7 +20,7 @@
             background-color: rgb(0, 0, 0);
         }
     </style>
-    <title>Kessel Wormhole</title>
+    <title>maf</title>
 </head>
 
 <body>
@@ -27,8 +30,8 @@
         <button onmousedown="thrustOn()" onmouseup="thrustOff()">Thrust</button>
         <button onmousedown="rotateCounterClockwiseThrustOn()" onmouseup="rotateThrustOff()">Counter-Clockwise</button>
 <br />
-<label>Engage Rotational Stablization System
-<input type="checkbox" onchange="setRotStablize()" />
+<label>Engage Rotational Stabilization System
+<input type="checkbox" onchange="setRotStabilize()" />
 </label>
     </div>
 
@@ -42,7 +45,7 @@
         canvas.width = W
         canvas.height = H
 
-        let stableize = false
+        let stabilize = false
         let isRotationThrustOff = true
 
         // state variables
@@ -58,7 +61,7 @@
             const items = new Array(size);
             let headIndex = 0;
             let tailIndex = 0;
-            let interationIndex = 0;
+            let iterationIndex = 0;
             let length = 0;
 
             const nextIndex = (index) => (index + 1) % size;
@@ -85,15 +88,15 @@
             };
 
             const resetIterate = () => {
-                interationIndex = headIndex; //(headIndex - 1 + size) % (size || 1);
+                iterationIndex = headIndex; //(headIndex - 1 + size) % (size || 1);
             };
 
             const nextItem = () => {
-                if (interationIndex === tailIndex) {
+                if (iterationIndex === tailIndex) {
                     return null;
                 }
-                const currentItem = items[interationIndex];
-                interationIndex = (interationIndex + 1) % (size || 1);
+                const currentItem = items[iterationIndex];
+                iterationIndex = (iterationIndex + 1) % (size || 1);
                 return currentItem;
             };
 
@@ -216,8 +219,8 @@
         function thrustOff() {
             thrust = 0.0
         }
-        function setRotStablize() {
-            stableize = !stableize
+        function setRotStabilize() {
+            stabilize = !stabilize
         }
 
         function rotateClockwiseThrustOn() {
@@ -257,7 +260,7 @@
         const rotationalStabilizerSystem = createPDController(0.1, 0.05);
 
         function updateState(deltaT, elapsedT) {
-            if (stableize && rotationRate) {
+            if (stabilize && rotationRate) {
                 const error = -rotationRate
                 const pidrRotationThrust = rotationalStabilizerSystem(error, deltaT/1000)
                 if (isRotationThrustOff) {
@@ -303,7 +306,7 @@
 
             frames++
             if (frames % 80 === 0) {
-                newcircle()
+                new_circle()
                 previousTimeStamp = timeStamp;
                 // console.log(position, rotationAngle)
             }
