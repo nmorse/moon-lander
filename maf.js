@@ -7,7 +7,7 @@ const ROT_THRUST = 0.0003
 canvas.width = W
 canvas.height = H
 
-let stabilize = false
+let stabilize = true
 let isRotationThrustOff = true
 let colorAngle = 0
 
