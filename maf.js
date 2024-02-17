@@ -9,6 +9,7 @@ canvas.height = H
 
 let stabilize = false
 let isRotationThrustOff = true
+let colorAngle = 0
 
 // state variables
 let rotationThrust = 0.0
@@ -124,17 +125,22 @@ function drawScene(deltaT, elapsedT) {
     queue.resetIterate()
     let circle = queue.nextItem()
     ctx.globalCompositeOperation = "lighten" // "lighten" "difference"
+    colorAngle += 0.1
+    colorAngle %= 360
+    ca = Math.floor(colorAngle)
     while (circle) {
         if (distance <= 0) {
             break
         }
         ctx.beginPath();
         ctx.arc(circle.x, circle.y, distance, 0, 2 * Math.PI);
-        ctx.fillStyle = `rgba(200, 240, 210, ${((255 - distance)/255)})`;
+        ctx.fillStyle = `hsla(${ca}deg 100% 33% / ${((255 - distance)/2.55)}%)`;
         ctx.fill();
         // ctx.strokeStyle = `rgb(${distance},${distance},${distance})`;
         // ctx.stroke();
         distance -= 18
+        ca += 360/36
+        ca = ca % 360
         circle = queue.nextItem()
     }
     ctx.restore();
