@@ -10,6 +10,7 @@ canvas.height = H
 let stabilize = true
 let isRotationThrustOff = true
 let colorAngle = 0
+let score = 1000
 
 // state variables
 let rotationThrust = 0.0
@@ -132,6 +133,10 @@ function drawScene(deltaT, elapsedT) {
         if (distance <= 0) {
             break
         }
+        // if (Math.abs(position[0]-circle.x) < distance/2 && Math.abs(position[1]-circle.y) < distance/2) {
+        //     score++
+        // }
+
         ctx.beginPath();
         ctx.arc(circle.x, circle.y, distance, 0, 2 * Math.PI);
         ctx.fillStyle = `hsla(${ca}deg 100% 33% / ${((255 - distance)/2.55)}%)`;
@@ -139,7 +144,7 @@ function drawScene(deltaT, elapsedT) {
         // ctx.strokeStyle = `rgb(${distance},${distance},${distance})`;
         // ctx.stroke();
         distance -= 18
-        ca += 360/36
+        ca += 10
         ca = ca % 360
         circle = queue.nextItem()
     }
@@ -153,27 +158,29 @@ function drawScene(deltaT, elapsedT) {
     ctx.lineTo(-10, -10);
     ctx.lineTo(-10, 10);
     ctx.stroke();
-
+    const r1 = Math.random()*0.4 + 0.8
+    const r2 = Math.random()*6 - 3
+    const r3 = Math.random()*6 - 3
     if (rotationThrust > 0.000002) {
         ctx.beginPath();
         ctx.moveTo(10, -9);
-        ctx.lineTo(10 + 30000*rotationThrust, -9);
+        ctx.lineTo((10 + 30000*rotationThrust)*r1, -9+r2);
         ctx.moveTo(-10, 9);
-        ctx.lineTo(-10 + -30000*rotationThrust, 9);
+        ctx.lineTo((-10 + -30000*rotationThrust)*r1, 9+r3);
         ctx.stroke();
     }
     if (rotationThrust < -0.000002) {
         ctx.beginPath();
         ctx.moveTo(-10, -9);
-        ctx.lineTo(-10 + 30000*rotationThrust, -9);
+        ctx.lineTo((-10 + 30000*rotationThrust)*r1, -9+r2);
         ctx.moveTo(10, 9);
-        ctx.lineTo(10 + -30000*rotationThrust, 9);
+        ctx.lineTo((10 + -30000*rotationThrust)*r1, 9)+r3;
         ctx.stroke();
     }
     if (Math.abs(thrust) > 0.000001) {
         ctx.beginPath();
         ctx.moveTo(0, 10);
-        ctx.lineTo(0, 20);
+        ctx.lineTo(0+r2, 30 * r1);
         ctx.stroke();
     }
 
@@ -270,14 +277,14 @@ function animate(timeStamp) {
     const elapsed = timeStamp - start;
 
     updateState(deltaT, elapsed);
-
-
     frames++
     if (frames % 80 === 0) {
         new_circle()
         previousTimeStamp = timeStamp;
-        // console.log(position, rotationAngle)
-    }
+        console.log(position, rotationAngle)
+        // const scoreBoard = document.getElementById("score") 
+        // scoreBoard.innerText = score+""
+        }
     requestAnimationFrame(animate);
 }
 

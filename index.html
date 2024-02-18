@@ -27,13 +27,15 @@
 <body>
     <canvas id="canvas"></canvas>
     <div>
-        <button onmousedown="rotateClockwiseThrustOn()" onmouseup="rotateThrustOff()">Rotate Clockwise</button>
-        <button onmousedown="thrustOn()" onmouseup="thrustOff()">Thrust</button>
-        <button onmousedown="rotateCounterClockwiseThrustOn()" onmouseup="rotateThrustOff()">Counter-Clockwise</button>
+        <button onmousedown="rotateCounterClockwiseThrustOn()" onmouseup="rotateThrustOff()">◀</button>
+        <button onmousedown="thrustOn()" onmouseup="thrustOff()"> ▲ </button>
+        <button onmousedown="rotateClockwiseThrustOn()" onmouseup="rotateThrustOff()">▶</button>
         <br />
-        <label>Engage Rotational Stabilization System
+        <label>Rotational Stabilization System
             <input type="checkbox" checked onchange="setRotStabilize()" />
         </label>
+        <br />
+        Score <span id="score">????</span>
     </div>
     <script src="maf.js"></script>
 </body>
