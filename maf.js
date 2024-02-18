@@ -281,7 +281,7 @@ function animate(timeStamp) {
     if (frames % 80 === 0) {
         new_circle()
         previousTimeStamp = timeStamp;
-        console.log(position, rotationAngle)
+        // console.log(position, rotationAngle)
         // const scoreBoard = document.getElementById("score") 
         // scoreBoard.innerText = score+""
         }
