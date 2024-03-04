@@ -14,7 +14,13 @@
             overflow: hidden;
             background-color: silver;
         }
-
+        div.container {
+            display: flex;
+        }
+        button {
+            width: 33%;
+            height: 6em;
+        }
         canvas {
             display: block;
             stroke: rgb(213, 201, 201);
@@ -27,10 +33,11 @@
 <body>
     <canvas id="canvas"></canvas>
     <div>
-        <button onmousedown="rotateCounterClockwiseThrustOn()" onmouseup="rotateThrustOff()">◀</button>
-        <button onmousedown="thrustOn()" onmouseup="thrustOff()"> ▲ </button>
-        <button onmousedown="rotateClockwiseThrustOn()" onmouseup="rotateThrustOff()">▶</button>
-        <br />
+        <div class="container">
+            <button id="leftArrow">◀</button>
+            <button id="upArrow"> ▲ </button>
+            <button  id="rightArrow">▶</button>
+        </div>
         <label>Rotational Stabilization System
             <input type="checkbox" checked onchange="setRotStabilize()" />
         </label>

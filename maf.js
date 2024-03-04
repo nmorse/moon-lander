@@ -139,7 +139,7 @@ function drawScene(deltaT, elapsedT) {
 
         ctx.beginPath();
         ctx.arc(circle.x, circle.y, distance, 0, 2 * Math.PI);
-        ctx.fillStyle = `hsla(${ca}deg 100% 33% / ${((255 - distance)/2.55)}%)`;
+        ctx.fillStyle = `hsla(${ca}deg 100% 33% / ${((255 - distance) / 2.55)}%)`;
         ctx.fill();
         // ctx.strokeStyle = `rgb(${distance},${distance},${distance})`;
         // ctx.stroke();
@@ -158,29 +158,29 @@ function drawScene(deltaT, elapsedT) {
     ctx.lineTo(-10, -10);
     ctx.lineTo(-10, 10);
     ctx.stroke();
-    const r1 = Math.random()*0.4 + 0.8
-    const r2 = Math.random()*6 - 3
-    const r3 = Math.random()*6 - 3
+    const r1 = Math.random() * 0.4 + 0.8
+    const r2 = Math.random() * 6 - 3
+    const r3 = Math.random() * 6 - 3
     if (rotationThrust > 0.000002) {
         ctx.beginPath();
         ctx.moveTo(10, -9);
-        ctx.lineTo((10 + 30000*rotationThrust)*r1, -9+r2);
+        ctx.lineTo((10 + 30000 * rotationThrust) * r1, -9 + r2);
         ctx.moveTo(-10, 9);
-        ctx.lineTo((-10 + -30000*rotationThrust)*r1, 9+r3);
+        ctx.lineTo((-10 + -30000 * rotationThrust) * r1, 9 + r3);
         ctx.stroke();
     }
     if (rotationThrust < -0.000002) {
         ctx.beginPath();
         ctx.moveTo(-10, -9);
-        ctx.lineTo((-10 + 30000*rotationThrust)*r1, -9+r2);
+        ctx.lineTo((-10 + 30000 * rotationThrust) * r1, -9 + r2);
         ctx.moveTo(10, 9);
-        ctx.lineTo((10 + -30000*rotationThrust)*r1, 9)+r3;
+        ctx.lineTo((10 + -30000 * rotationThrust) * r1, 9) + r3;
         ctx.stroke();
     }
     if (Math.abs(thrust) > 0.000001) {
         ctx.beginPath();
         ctx.moveTo(0, 10);
-        ctx.lineTo(0+r2, 30 * r1);
+        ctx.lineTo(0 + r2, 30 * r1);
         ctx.stroke();
     }
 
@@ -237,7 +237,7 @@ const rotationalStabilizerSystem = createPDController(0.1, 0.05);
 function updateState(deltaT, elapsedT) {
     if (stabilize && rotationRate) {
         const error = -rotationRate
-        const pidrRotationThrust = rotationalStabilizerSystem(error, deltaT/1000)
+        const pidrRotationThrust = rotationalStabilizerSystem(error, deltaT / 1000)
         if (isRotationThrustOff) {
             rotationThrust = Math.min(Math.max(pidrRotationThrust, -ROT_THRUST), ROT_THRUST)
             // console.log(error.toFixed(5), pidrRotationThrust.toFixed(5))
@@ -247,7 +247,7 @@ function updateState(deltaT, elapsedT) {
     rotationAngle += rotationRate
 
     rate = [rate[0] + Math.sin(rotationAngle) * thrust,
-            rate[1] + Math.cos(rotationAngle) * thrust]
+    rate[1] + Math.cos(rotationAngle) * thrust]
     position = [position[0] + rate[0], position[1] + rate[1]]
     drawScene(deltaT, elapsedT);
 }
@@ -284,7 +284,7 @@ function animate(timeStamp) {
         // console.log(position, rotationAngle)
         // const scoreBoard = document.getElementById("score") 
         // scoreBoard.innerText = score+""
-        }
+    }
     requestAnimationFrame(animate);
 }
 
@@ -329,3 +329,20 @@ function handleKeyUp(event) {
 }
 document.addEventListener("keydown", handleKeyDown);
 document.addEventListener("keyup", handleKeyUp);
+
+document.getElementById('leftArrow').addEventListener("mousedown", rotateCounterClockwiseThrustOn);
+document.getElementById('upArrow').addEventListener("mousedown", thrustOn);
+document.getElementById('rightArrow').addEventListener("mousedown", rotateClockwiseThrustOn);
+document.getElementById('leftArrow').addEventListener("mouseup", rotateThrustOff);
+document.getElementById('upArrow').addEventListener("mouseup", thrustOff);
+document.getElementById('rightArrow').addEventListener("mouseup", rotateThrustOff);
+document.getElementById('leftArrow').addEventListener("mouseout", rotateThrustOff);
+document.getElementById('upArrow').addEventListener("mouseout", thrustOff);
+document.getElementById('rightArrow').addEventListener("mouseout", rotateThrustOff);
+
+document.getElementById('leftArrow').addEventListener("touchstart", rotateCounterClockwiseThrustOn);
+document.getElementById('upArrow').addEventListener("touchstart", thrustOn);
+document.getElementById('rightArrow').addEventListener("touchstart", rotateClockwiseThrustOn);
+document.getElementById('leftArrow').addEventListener("touchend", rotateThrustOff);
+document.getElementById('upArrow').addEventListener("touchend", thrustOff);
+document.getElementById('rightArrow').addEventListener("touchend", rotateThrustOff);
