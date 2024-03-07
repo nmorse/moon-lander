@@ -1,5 +1,5 @@
 const cacheName = "mafCache"
-const precachedResources = ["/", "/index.html", "/maf.js"];
+const precachedResources = ["/", "/index.html", "/maf.js", "/cl.js"];
 
 async function precache() {
     const cache = await caches.open(cacheName);

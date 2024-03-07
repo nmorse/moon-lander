@@ -1,7 +1,7 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const circles = [];
-const W = 500
+const W = 1000
 const H = W
 const ROT_THRUST = 0.0003
 canvas.width = W
@@ -20,58 +20,6 @@ let thrust = 0.0
 let rate = [0.0, 0.0]
 let position = [0.0, 0.0]
 
-
-function CircularList(size) {
-    const items = new Array(size);
-    let headIndex = 0;
-    let tailIndex = 0;
-    let iterationIndex = 0;
-    let length = 0;
-
-    const nextIndex = (index) => (index + 1) % size;
-
-    const enqueue = (item) => {
-        if (nextIndex(tailIndex) !== headIndex) {
-            items[tailIndex] = item;
-            tailIndex = nextIndex(tailIndex);
-            length++
-        } else {
-            throw new Error('Circular list is full. Cannot enqueue.');
-        }
-    };
-
-    const dequeue = () => {
-        if (headIndex !== tailIndex) {
-            const item = items[headIndex];
-            headIndex = nextIndex(headIndex);
-            length--
-            return item;
-        } else {
-            throw new Error('Circular list is empty. Cannot dequeue.');
-        }
-    };
-
-    const resetIterate = () => {
-        iterationIndex = headIndex; //(headIndex - 1 + size) % (size || 1);
-    };
-
-    const nextItem = () => {
-        if (iterationIndex === tailIndex) {
-            return null;
-        }
-        const currentItem = items[iterationIndex];
-        iterationIndex = (iterationIndex + 1) % (size || 1);
-        return currentItem;
-    };
-
-    return {
-        nextItem,
-        resetIterate,
-        enqueue,
-        dequeue
-    };
-
-}
 
 const queue = CircularList(19);
 
@@ -94,8 +42,8 @@ for (let i = 0; i < 18; i++) {
 
 function drawScene(deltaT, elapsedT) {
     ctx.save();
-    ctx.clearRect(0, 0, W, H);
-    ctx.translate(W / 2, H / 2); // translate to center
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.translate(canvas.width / 2, canvas.height / 2); // translate to center
     // ship in the center of the screen 
     ctx.save()
 
@@ -104,10 +52,10 @@ function drawScene(deltaT, elapsedT) {
 
     ctx.strokeStyle = `rgb(0, 0, 250)`;
     ctx.beginPath();
-    const minW = -W + position[0]
-    const maxW = W + position[0]
-    const minH = -H + position[1]
-    const maxH = H + position[1]
+    const minW = -canvas.width + position[0]
+    const maxW = canvas.width + position[0]
+    const minH = -canvas.height + position[1]
+    const maxH = canvas.height + position[1]
     for (let x = minW; x < maxW; x += 50) {
         ctx.moveTo(x, minH);
         ctx.lineTo(x, maxH);
@@ -288,15 +236,39 @@ function animate(timeStamp) {
     requestAnimationFrame(animate);
 }
 
-// canvas.width = window.innerWidth;
-// canvas.height = window.innerHeight;
+// Function to handle resize events
+function handleResize() {
+    // Get the updated width and height of the viewport
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const viewportWidthRatio = viewportWidth / W;
+    const viewportHeightRatio = viewportHeight / H;
 
-window.addEventListener('resize', () => {
-    // canvas.width = window.innerWidth;
-    // canvas.height = window.innerHeight;
-    drawScene();
-});
+    if (viewportWidthRatio < 1.0 || viewportHeightRatio < 1.0) {
+        if (viewportWidthRatio < viewportHeightRatio) {
+            //console.log("viewportWidth, Math.floor(H * viewportWidthRatio)", viewportWidth, Math.floor(canvas.height * viewportWidthRatio))
+            changeCanvasSize(viewportWidth, Math.floor(H * viewportWidthRatio));
+        }
+        else {
+            //console.log("Math.floor(W * viewportHeightRatio), viewportHeight", Math.floor(canvas.width * viewportHeightRatio), viewportHeight)
+            changeCanvasSize(Math.floor(W * viewportHeightRatio), viewportHeight);
+        }
+        drawScene();
+    }
+}
 
+function changeCanvasSize(newWidth, newHeight) {
+    var canvas = document.getElementById("canvas");
+    // Update canvas size
+    canvas.width = newWidth;
+    canvas.height = newHeight;
+}
+
+// Attach the event listener to the resize event
+window.addEventListener('resize', handleResize);
+
+
+handleResize()
 drawScene();
 animate();
 function handleKeyDown(event) {
