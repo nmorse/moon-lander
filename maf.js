@@ -236,9 +236,14 @@ function animate(timeStamp) {
     requestAnimationFrame(animate);
 }
 
+const heightOutput = document.querySelector("#height");
+const widthOutput = document.querySelector("#width");
+
 // Function to handle resize events
 function handleResize() {
-    // Get the updated width and height of the viewport
+    heightOutput.textContent = window.innerHeight;
+    widthOutput.textContent = window.innerWidth;
+      // Get the updated width and height of the viewport
     const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
     const viewportWidthRatio = viewportWidth / W;
