@@ -1,7 +1,7 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const circles = [];
-const W = 1000
+const W = 400
 const H = W
 const ROT_THRUST = 0.0003
 canvas.width = W
@@ -212,7 +212,7 @@ const new_circle = () => {
     ly = y
 }
 
-let frames = 0
+// let frames = 0
 let previousTimeStamp, start
 function animate(timeStamp) {
     if (previousTimeStamp === undefined) {
@@ -225,8 +225,8 @@ function animate(timeStamp) {
     const elapsed = timeStamp - start;
 
     updateState(deltaT, elapsed);
-    frames++
-    if (frames % 80 === 0) {
+    // frames++
+    if (deltaT > 4000) { // (frames % 80 === 0) {
         new_circle()
         previousTimeStamp = timeStamp;
         // console.log(position, rotationAngle)
