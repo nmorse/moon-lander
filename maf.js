@@ -2,7 +2,7 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const circles = [];
 const W = 400
-const H = W + 150
+const H = W
 const ROT_THRUST = 0.0003
 canvas.width = W
 canvas.height = H
@@ -225,8 +225,8 @@ function animate(timeStamp) {
     const elapsed = timeStamp - start;
 
     updateState(deltaT, elapsed);
-    // frames++
-    if (deltaT > 4000) { // (frames % 80 === 0) {
+    frames++
+    if  (frames % 80 === 0) { // (deltaT > 4000) {
         new_circle()
         previousTimeStamp = timeStamp;
         // console.log(position, rotationAngle)
@@ -249,7 +249,7 @@ function handleResize() {
     const viewportWidthRatio = viewportWidth / W;
     const viewportHeightRatio = viewportHeight / H;
 
-    if (viewportWidthRatio < 1.0 || viewportHeightRatio < 1.0) {
+    if (viewportWidthRatio < 1.0 || viewportHeightRatio < 1.5) {
         if (viewportWidthRatio < viewportHeightRatio) {
             //console.log("viewportWidth, Math.floor(H * viewportWidthRatio)", viewportWidth, Math.floor(canvas.height * viewportWidthRatio))
             changeCanvasSize(viewportWidth, Math.floor(H * viewportWidthRatio));
