@@ -131,30 +131,34 @@ function drawScene(deltaT, elapsedT) {
         ctx.lineTo(0 + r2, 30 * r1);
         ctx.stroke();
     }
-
-
     ctx.restore();
 }
 
-function thrustOn() {
+function thrustOn(e) {
+    e.preventDefault();
     thrust = 0.01
 }
-function thrustOff() {
+function thrustOff(e) {
+    e.preventDefault();
     thrust = 0.0
 }
 function setRotStabilize() {
+    // e.preventDefault();
     stabilize = !stabilize
 }
 
-function rotateClockwiseThrustOn() {
+function rotateClockwiseThrustOn(e) {
+    e.preventDefault();
     rotationThrust = -ROT_THRUST
     isRotationThrustOff = false
 }
-function rotateThrustOff() {
+function rotateThrustOff(e) {
+    e.preventDefault();
     rotationThrust = 0.0
     isRotationThrustOff = true
 }
-function rotateCounterClockwiseThrustOn() {
+function rotateCounterClockwiseThrustOn(e) {
+    e.preventDefault();
     rotationThrust = ROT_THRUST
     isRotationThrustOff = false
 }
@@ -212,7 +216,7 @@ const new_circle = () => {
     ly = y
 }
 
-// let frames = 0
+let frames = 0
 let previousTimeStamp, start
 function animate(timeStamp) {
     if (previousTimeStamp === undefined) {
@@ -278,30 +282,30 @@ drawScene();
 animate();
 function handleKeyDown(event) {
     if (event.keyCode === 37) {
-        rotateCounterClockwiseThrustOn()
+        rotateCounterClockwiseThrustOn(event)
     }
     if (event.keyCode === 38) {
-        thrustOn()
+        thrustOn(event)
     }
     if (event.keyCode === 39) {
-        rotateClockwiseThrustOn()
+        rotateClockwiseThrustOn(event)
     }
     if (event.keyCode === 40) {
-        thrustOff()
+        thrustOff(event)
     }
 }
 function handleKeyUp(event) {
     if (event.keyCode === 37) {
-        rotateThrustOff()
+        rotateThrustOff(event)
     }
     if (event.keyCode === 38) {
-        thrustOff()
+        thrustOff(event)
     }
     if (event.keyCode === 39) {
-        rotateThrustOff()
+        rotateThrustOff(event)
     }
     if (event.keyCode === 40) {
-        thrustOff()
+        thrustOff(event)
     }
 }
 document.addEventListener("keydown", handleKeyDown);
