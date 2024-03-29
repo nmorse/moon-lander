@@ -9,7 +9,7 @@ canvas.height = H
 
 let stabilize = true
 let isRotationThrustOff = true
-let colorAngle = 0
+let colorAngle = 40
 let score = 1000
 
 // state variables
