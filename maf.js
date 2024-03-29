@@ -21,7 +21,7 @@ let rate = [0.0, 0.0]
 let position = [0.0, 0.0]
 
 
-const queue = CircularList(19);
+const queue = CircularList(20);
 
 // Initialize the wormhole (circles)
 let lx, ly = null
@@ -70,7 +70,7 @@ function drawScene(deltaT, elapsedT) {
     ctx.translate(position[0], position[1]);
 
 
-    let distance = 255 + (deltaT / 70)
+    let distance = 255 + (deltaT / 110)
     queue.resetIterate()
     let circle = queue.nextItem()
     ctx.globalCompositeOperation = "lighten" // "lighten" "difference"
@@ -230,7 +230,8 @@ function animate(timeStamp) {
 
     updateState(deltaT, elapsed);
     frames++
-    if  (frames % 80 === 0) { // (deltaT > 4000) {
+    if (deltaT > 2000) { // (frames % 80 === 0) { 
+        // console.log("deltaT, elapsed", deltaT, elapsed);
         new_circle()
         previousTimeStamp = timeStamp;
         // console.log(position, rotationAngle)
