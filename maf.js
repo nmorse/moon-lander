@@ -1,7 +1,7 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const circles = [];
-const W = 400
+const W = 800
 const H = W
 const ROT_THRUST = 0.0003
 canvas.width = W
@@ -10,7 +10,7 @@ canvas.height = H
 let stabilize = true
 let isRotationThrustOff = true
 let colorAngle = 180
-let score = 1000
+let score = 300
 
 // state variables
 let rotationThrust = 0.0
@@ -102,30 +102,32 @@ function drawScene(deltaT, elapsedT) {
     ctx.lineTo(-10, -10);
     ctx.lineTo(-10, 10);
     ctx.stroke();
-    const r1 = Math.random() * 0.4 + 0.8
-    const r2 = Math.random() * 6 - 3
-    const r3 = Math.random() * 6 - 3
-    if (rotationThrust > 0.000002) {
-        ctx.beginPath();
-        ctx.moveTo(10, -9);
-        ctx.lineTo((10 + 30000 * rotationThrust) * r1, -9 + r2);
-        ctx.moveTo(-10, 9);
-        ctx.lineTo((-10 + -30000 * rotationThrust) * r1, 9 + r3);
-        ctx.stroke();
-    }
-    if (rotationThrust < -0.000002) {
-        ctx.beginPath();
-        ctx.moveTo(-10, -9);
-        ctx.lineTo((-10 + 30000 * rotationThrust) * r1, -9 + r2);
-        ctx.moveTo(10, 9);
-        ctx.lineTo((10 + -30000 * rotationThrust) * r1, 9) + r3;
-        ctx.stroke();
-    }
-    if (Math.abs(thrust) > 0.000001) {
-        ctx.beginPath();
-        ctx.moveTo(0, 10);
-        ctx.lineTo(0 + r2, 30 * r1);
-        ctx.stroke();
+    if (score > 0) {
+        const r1 = Math.random() * 0.4 + 0.8
+        const r2 = Math.random() * 6 - 3
+        const r3 = Math.random() * 6 - 3
+        if (rotationThrust > 0.000002) {
+            ctx.beginPath();
+            ctx.moveTo(10, -9);
+            ctx.lineTo((10 + 30000 * rotationThrust) * r1, -9 + r2);
+            ctx.moveTo(-10, 9);
+            ctx.lineTo((-10 + -30000 * rotationThrust) * r1, 9 + r3);
+            ctx.stroke();
+        }
+        if (rotationThrust < -0.000002) {
+            ctx.beginPath();
+            ctx.moveTo(-10, -9);
+            ctx.lineTo((-10 + 30000 * rotationThrust) * r1, -9 + r2);
+            ctx.moveTo(10, 9);
+            ctx.lineTo((10 + -30000 * rotationThrust) * r1, 9) + r3;
+            ctx.stroke();
+        }
+        if (Math.abs(thrust) > 0.000001) {
+            ctx.beginPath();
+            ctx.moveTo(0, 10);
+            ctx.lineTo(0 + r2, 30 * r1);
+            ctx.stroke();
+        }
     }
     ctx.restore();
 }
@@ -191,12 +193,14 @@ function updateState(deltaT, elapsedT) {
             // console.log(error.toFixed(5), pidrRotationThrust.toFixed(5))
         }
     }
-    rotationRate += rotationThrust
-    rotationAngle += rotationRate
-    // console.log(rotationThrust, thrust)
-    score = score - Math.abs(thrust*100) - Math.abs(rotationThrust*100)
-    rate = [rate[0] + Math.sin(rotationAngle) * thrust,
-    rate[1] + Math.cos(rotationAngle) * thrust]
+    if (score > 0) {
+        rotationRate += rotationThrust
+        rotationAngle += rotationRate
+        // console.log(rotationThrust, thrust)
+        score = score - Math.abs(thrust * 100) - Math.abs(rotationThrust * 100)
+        rate = [rate[0] + Math.sin(rotationAngle) * thrust,
+        rate[1] + Math.cos(rotationAngle) * thrust]
+    }
     position = [position[0] + rate[0], position[1] + rate[1]]
     drawScene(deltaT, elapsedT);
 }
@@ -221,13 +225,13 @@ const new_circle = () => {
         if (Math.abs(position[0] + circle.x) < radius && Math.abs(position[1] + circle.y) < radius) {
             score += points
             // console.log(points)
-    }
+        }
         circle = queue.nextItem()
         radius -= 9
         points += 1
     }
     if (Math.abs(position[0] + x) < 10 && Math.abs(position[1] + y) < 10) {
-        score += 100000
+        score += 800
     }
 
     lx = x
@@ -254,7 +258,7 @@ function animate(timeStamp) {
         previousTimeStamp = timeStamp;
         // console.log(position, rotationAngle)
         const scoreBoard = document.getElementById("score")
-        scoreBoard.innerText = score + ""
+        scoreBoard.innerText = Math.round(score) + ""
     }
     requestAnimationFrame(animate);
 }
