@@ -20,14 +20,13 @@ let thrust = 0.0
 let rate = [0.0, 0.0]
 let position = [0.0, 0.0]
 
-
 const queue = CircularList(20);
 
 // Initialize the wormhole (circles)
 let lx, ly = null
 for (let i = 0; i < 18; i++) {
     if (ly !== null) {
-        lx = 0
+        lx = -300
         ly = 0
     }
     const x = lx + (Math.random() * 50 - 25)
@@ -71,6 +70,7 @@ function drawScene(deltaT, elapsedT) {
 
 
     let distance = 255 + (deltaT / 110)
+    // console.log(distance)
     queue.resetIterate()
     let circle = queue.nextItem()
     ctx.globalCompositeOperation = "lighten" // "lighten" "difference"
@@ -81,10 +81,6 @@ function drawScene(deltaT, elapsedT) {
         if (distance <= 0) {
             break
         }
-        // if (Math.abs(position[0]-circle.x) < distance/2 && Math.abs(position[1]-circle.y) < distance/2) {
-        //     score++
-        // }
-
         ctx.beginPath();
         ctx.arc(circle.x, circle.y, distance, 0, 2 * Math.PI);
         ctx.fillStyle = `hsla(${ca}deg 100% 33% / ${((255 - distance) / 2.55)}%)`;
@@ -197,7 +193,8 @@ function updateState(deltaT, elapsedT) {
     }
     rotationRate += rotationThrust
     rotationAngle += rotationRate
-
+    // console.log(rotationThrust, thrust)
+    score = score - Math.abs(thrust*100) - Math.abs(rotationThrust*100)
     rate = [rate[0] + Math.sin(rotationAngle) * thrust,
     rate[1] + Math.cos(rotationAngle) * thrust]
     position = [position[0] + rate[0], position[1] + rate[1]]
@@ -208,10 +205,31 @@ const new_circle = () => {
     queue.dequeue()
     const x = lx + (Math.random() * 100 - 50)
     const y = ly + (Math.random() * 100 - 50)
+    // console.log(position[0] + x, position[1] + y)
     queue.enqueue({
         x,
         y,
     });
+
+    queue.resetIterate()
+    let circle = queue.nextItem()
+    let radius = 180
+    let points = 1
+    // console.log("-----------")
+    while (circle) {
+        // console.log(radius)
+        if (Math.abs(position[0] + circle.x) < radius && Math.abs(position[1] + circle.y) < radius) {
+            score += points
+            // console.log(points)
+    }
+        circle = queue.nextItem()
+        radius -= 9
+        points += 1
+    }
+    if (Math.abs(position[0] + x) < 10 && Math.abs(position[1] + y) < 10) {
+        score += 100000
+    }
+
     lx = x
     ly = y
 }
@@ -229,14 +247,14 @@ function animate(timeStamp) {
     const elapsed = timeStamp - start;
 
     updateState(deltaT, elapsed);
-    frames++
+    // frames++
     if (deltaT > 2000) { // (frames % 80 === 0) { 
         // console.log("deltaT, elapsed", deltaT, elapsed);
         new_circle()
         previousTimeStamp = timeStamp;
         // console.log(position, rotationAngle)
-        // const scoreBoard = document.getElementById("score") 
-        // scoreBoard.innerText = score+""
+        const scoreBoard = document.getElementById("score")
+        scoreBoard.innerText = score + ""
     }
     requestAnimationFrame(animate);
 }
@@ -248,7 +266,7 @@ const widthOutput = document.querySelector("#width");
 function handleResize() {
     heightOutput.textContent = window.innerHeight;
     widthOutput.textContent = window.innerWidth;
-      // Get the updated width and height of the viewport
+    // Get the updated width and height of the viewport
     const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
     const viewportWidthRatio = viewportWidth / W;
