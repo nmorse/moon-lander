@@ -10,7 +10,8 @@ canvas.height = H
 let stabilize = true
 let isRotationThrustOff = true
 let colorAngle = 180
-let score = 300
+let fuel = 300
+const fuelCap = 6000
 
 // state variables
 let rotationThrust = 0.0
@@ -102,7 +103,13 @@ function drawScene(deltaT, elapsedT) {
     ctx.lineTo(-10, -10);
     ctx.lineTo(-10, 10);
     ctx.stroke();
-    if (score > 0) {
+    // draw the fuel level
+    ctx.save();
+    ctx.fillStyle = `rgb(20, 255, 20)`
+    ctx.fillRect(-2, 10, 4, -fuel/fuelCap*20);
+    ctx.restore();
+
+    if (fuel > 0) {
         const r1 = Math.random() * 0.4 + 0.8
         const r2 = Math.random() * 6 - 3
         const r3 = Math.random() * 6 - 3
@@ -193,11 +200,12 @@ function updateState(deltaT, elapsedT) {
             // console.log(error.toFixed(5), pidrRotationThrust.toFixed(5))
         }
     }
-    if (score > 0) {
+    // go
+    if (fuel > 0) {
         rotationRate += rotationThrust
         rotationAngle += rotationRate
         // console.log(rotationThrust, thrust)
-        score = score - Math.abs(thrust * 100) - Math.abs(rotationThrust * 100)
+        fuel = fuel - Math.abs(thrust * 100) - Math.abs(rotationThrust * 100)
         rate = [rate[0] + Math.sin(rotationAngle) * thrust,
         rate[1] + Math.cos(rotationAngle) * thrust]
     }
@@ -222,8 +230,8 @@ const new_circle = () => {
     // console.log("-----------")
     while (circle) {
         // console.log(radius)
-        if (Math.abs(position[0] + circle.x) < radius && Math.abs(position[1] + circle.y) < radius) {
-            score += points
+        if (Math.abs(position[0] + circle.x) < radius && Math.abs(position[1] + circle.y) < radius && fuel <= fuelCap) {
+            fuel = Math.min(fuel + points, fuelCap)
             // console.log(points)
         }
         circle = queue.nextItem()
@@ -231,7 +239,7 @@ const new_circle = () => {
         points += 1
     }
     if (Math.abs(position[0] + x) < 10 && Math.abs(position[1] + y) < 10) {
-        score += 800
+        fuel += 800
     }
 
     lx = x
@@ -258,7 +266,7 @@ function animate(timeStamp) {
         previousTimeStamp = timeStamp;
         // console.log(position, rotationAngle)
         const scoreBoard = document.getElementById("score")
-        scoreBoard.innerText = Math.round(score) + ""
+        scoreBoard.innerText = Math.round(fuel) + ""
     }
     requestAnimationFrame(animate);
 }
