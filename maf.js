@@ -1,16 +1,18 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const circles = [];
-const W = 800
+const W = 600
 const H = W
 const ROT_THRUST = 0.0003
 canvas.width = W
 canvas.height = H
 
+let gameover = false
+let gameoverReason = ""
 let stabilize = true
 let isRotationThrustOff = true
 let colorAngle = 180
-let fuel = 300
+let fuel = 6000
 const fuelCap = 6000
 
 // state variables
@@ -21,24 +23,19 @@ let thrust = 0.0
 let rate = [0.0, 0.0]
 let position = [0.0, 0.0]
 
-const queue = CircularList(20);
-
-// Initialize the wormhole (circles)
-let lx, ly = null
-for (let i = 0; i < 18; i++) {
-    if (ly !== null) {
-        lx = -300
-        ly = 0
-    }
-    const x = lx + (Math.random() * 50 - 25)
-    const y = ly + (Math.random() * 50 - 25)
-    queue.enqueue({
-        x,
-        y,
-    });
-    lx = x
-    ly = y
+const resetSpace = () => {
+    gameover = false
+    isRotationThrustOff = true
+    fuel = 6000
+    rotationThrust = 0.0
+    rotationRate = 0.0
+    rotationAngle = Math.PI / 2
+    thrust = 0.0
+    rate = [0.0, 0.0]
+    position = [0.0, 0.0]
 }
+
+// Initialize the moon surface
 
 function drawScene(deltaT, elapsedT) {
     ctx.save();
@@ -69,30 +66,9 @@ function drawScene(deltaT, elapsedT) {
 
     ctx.translate(position[0], position[1]);
 
+    ctx.fillStyle = `rgb(80, 80, 80)`
+    ctx.fillRect(300, -2000, 2000, 4000)
 
-    let distance = 255 + (deltaT / 110)
-    // console.log(distance)
-    queue.resetIterate()
-    let circle = queue.nextItem()
-    ctx.globalCompositeOperation = "lighten" // "lighten" "difference"
-    colorAngle += 0.1
-    colorAngle %= 360
-    ca = Math.floor(colorAngle)
-    while (circle) {
-        if (distance <= 0) {
-            break
-        }
-        ctx.beginPath();
-        ctx.arc(circle.x, circle.y, distance, 0, 2 * Math.PI);
-        ctx.fillStyle = `hsla(${ca}deg 100% 33% / ${((255 - distance) / 2.55)}%)`;
-        ctx.fill();
-        // ctx.strokeStyle = `rgb(${distance},${distance},${distance})`;
-        // ctx.stroke();
-        distance -= 18
-        ca += 10
-        ca = ca % 360
-        circle = queue.nextItem()
-    }
     ctx.restore();
     // draw the Vessel
     ctx.strokeStyle = `rgb(200, 0, 0)`;
@@ -106,7 +82,7 @@ function drawScene(deltaT, elapsedT) {
     // draw the fuel level
     ctx.save();
     ctx.fillStyle = `rgb(20, 255, 20)`
-    ctx.fillRect(-2, 10, 4, -fuel/fuelCap*20);
+    ctx.fillRect(-2, 10, 4, -fuel / fuelCap * 20);
     ctx.restore();
 
     if (fuel > 0) {
@@ -137,6 +113,10 @@ function drawScene(deltaT, elapsedT) {
         }
     }
     ctx.restore();
+    if (gameover && gameoverReason) {
+        alert(gameoverReason + " Press Enter to Reset.")
+        gameoverReason = ""
+    }
 }
 
 function thrustOn(e) {
@@ -192,6 +172,7 @@ function createPDController(kp, kd) {
 const rotationalStabilizerSystem = createPDController(0.1, 0.05);
 
 function updateState(deltaT, elapsedT) {
+
     if (stabilize && rotationRate) {
         const error = -rotationRate
         const pidrRotationThrust = rotationalStabilizerSystem(error, deltaT / 1000)
@@ -200,7 +181,8 @@ function updateState(deltaT, elapsedT) {
             // console.log(error.toFixed(5), pidrRotationThrust.toFixed(5))
         }
     }
-    // go
+
+    // thrust
     if (fuel > 0) {
         rotationRate += rotationThrust
         rotationAngle += rotationRate
@@ -209,42 +191,51 @@ function updateState(deltaT, elapsedT) {
         rate = [rate[0] + Math.sin(rotationAngle) * thrust,
         rate[1] + Math.cos(rotationAngle) * thrust]
     }
+
     position = [position[0] + rate[0], position[1] + rate[1]]
+
+    // crash test
+    if (position[0] <= -290 && position[1] < 2000 && position[1] > -2000 ) {
+        if (rate[0] !== 0 ||
+            rate[1] !== 0) {
+            console.log(rate, rotationAngle)
+            if (rate[0] < -0.8) {
+                fuel = 0
+                position[0] = -295
+                rate[0] = 0
+                rate[1] = 0
+                rotationRate = 0.0
+                gameover = true
+                gameoverReason = "Crash Landing!"
+            }
+            else if (rate[0] < -0.2) {
+                // bounce
+                rate[0] = -rate[0]*0.8
+                rate[1] = rate[1]*0.8
+                // roll
+                position[0] = -290
+            }
+            else {
+                rate[0] = 0
+                rate[1] = 0
+                rotationRate = 0.0
+                position[0] = -290
+                if (fuel <= 0) {
+                    gameover = true
+                    gameoverReason = "Out of Fuel!"
+                }
+            }
+        }
+    }
+    else {
+        // gravity
+        rate = [rate[0] + 1 * -0.004,
+        rate[1] + 0 * -0.004]
+    }
+
     drawScene(deltaT, elapsedT);
 }
 
-const new_circle = () => {
-    queue.dequeue()
-    const x = lx + (Math.random() * 100 - 50)
-    const y = ly + (Math.random() * 100 - 50)
-    // console.log(position[0] + x, position[1] + y)
-    queue.enqueue({
-        x,
-        y,
-    });
-
-    queue.resetIterate()
-    let circle = queue.nextItem()
-    let radius = 180
-    let points = 1
-    // console.log("-----------")
-    while (circle) {
-        // console.log(radius)
-        if (Math.abs(position[0] + circle.x) < radius && Math.abs(position[1] + circle.y) < radius && fuel <= fuelCap) {
-            fuel = Math.min(fuel + points, fuelCap)
-            // console.log(points)
-        }
-        circle = queue.nextItem()
-        radius -= 9
-        points += 1
-    }
-    if (Math.abs(position[0] + x) < 10 && Math.abs(position[1] + y) < 10) {
-        fuel += 800
-    }
-
-    lx = x
-    ly = y
-}
 
 let frames = 0
 let previousTimeStamp, start
@@ -262,7 +253,6 @@ function animate(timeStamp) {
     // frames++
     if (deltaT > 2000) { // (frames % 80 === 0) { 
         // console.log("deltaT, elapsed", deltaT, elapsed);
-        new_circle()
         previousTimeStamp = timeStamp;
         // console.log(position, rotationAngle)
         const scoreBoard = document.getElementById("score")
@@ -314,29 +304,42 @@ animate();
 function handleKeyDown(event) {
     if (event.keyCode === 37) {
         rotateCounterClockwiseThrustOn(event)
+        return
     }
     if (event.keyCode === 38) {
         thrustOn(event)
+        return
     }
     if (event.keyCode === 39) {
         rotateClockwiseThrustOn(event)
+        return
     }
     if (event.keyCode === 40) {
         thrustOff(event)
+        return
+    }
+    console.log(event.keyCode)
+    if (event.keyCode === 13) {
+        resetSpace(event)
+        return
     }
 }
 function handleKeyUp(event) {
     if (event.keyCode === 37) {
         rotateThrustOff(event)
+        return
     }
     if (event.keyCode === 38) {
         thrustOff(event)
+        return
     }
     if (event.keyCode === 39) {
         rotateThrustOff(event)
+        return
     }
     if (event.keyCode === 40) {
         thrustOff(event)
+        return
     }
 }
 document.addEventListener("keydown", handleKeyDown);
