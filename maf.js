@@ -1,6 +1,5 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const circles = [];
 const W = 600
 const H = W
 const ROT_THRUST = 0.0003
@@ -66,8 +65,11 @@ function drawScene(deltaT, elapsedT) {
 
     ctx.translate(position[0], position[1]);
 
+    // draw the moon
     ctx.fillStyle = `rgb(80, 80, 80)`
-    ctx.fillRect(300, -2000, 2000, 4000)
+    ctx.beginPath();
+    ctx.arc(2300, 0, 2000, 0, 2 * Math.PI);
+    ctx.fill();
 
     ctx.restore();
     // draw the Vessel
@@ -168,11 +170,32 @@ function createPDController(kp, kd) {
         return output;
     };
 }
+function normalizeVector(vector) {
+    // Calculate the magnitude of the vector
+    const magnitude = Math.sqrt(vector[0] ** 2 + vector[1] ** 2);
+
+    // Check if the magnitude is zero to avoid division by zero
+    if (magnitude === 0) {
+        return [0, 0]; // If the vector is already a zero vector, return [0, 0]
+    } else {
+        // Normalize the vector by dividing each component by its magnitude
+        const normalizedVector = [vector[0] / magnitude, vector[1] / magnitude];
+        return normalizedVector;
+    }
+}
+
+const scaleVector = (v, s) => ([v[0] * s, v[1] * s])
+
+function calculateChangeInPosition(p, massOfBody, deltaTime) {
+    const dx = -2300 - p[0]
+    const dy = 0 - p[1]
+    const nv = normalizeVector([dx, dy])
+    return scaleVector(nv, 0.005)
+}
 
 const rotationalStabilizerSystem = createPDController(0.1, 0.05);
 
 function updateState(deltaT, elapsedT) {
-
     if (stabilize && rotationRate) {
         const error = -rotationRate
         const pidrRotationThrust = rotationalStabilizerSystem(error, deltaT / 1000)
@@ -195,13 +218,15 @@ function updateState(deltaT, elapsedT) {
     position = [position[0] + rate[0], position[1] + rate[1]]
 
     // crash test
-    if (position[0] <= -290 && position[1] < 2000 && position[1] > -2000 ) {
+    const distance = Math.sqrt((-2300 - position[0]) ** 2 + (0 - position[1]) ** 2); // Distance between the two points
+
+    if (distance <= 2010) {
         if (rate[0] !== 0 ||
             rate[1] !== 0) {
-            console.log(rate, rotationAngle)
+            // console.log(rate, rotationAngle)
             if (rate[0] < -0.8) {
                 fuel = 0
-                position[0] = -295
+                // position[0] = -295
                 rate[0] = 0
                 rate[1] = 0
                 rotationRate = 0.0
@@ -210,16 +235,16 @@ function updateState(deltaT, elapsedT) {
             }
             else if (rate[0] < -0.2) {
                 // bounce
-                rate[0] = -rate[0]*0.8
-                rate[1] = rate[1]*0.8
+                rate[0] = -rate[0] * 0.8
+                rate[1] = rate[1] * 0.8
                 // roll
-                position[0] = -290
+                //position[0] = -290
             }
             else {
                 rate[0] = 0
                 rate[1] = 0
                 rotationRate = 0.0
-                position[0] = -290
+                //position[0] = -290
                 if (fuel <= 0) {
                     gameover = true
                     gameoverReason = "Out of Fuel!"
@@ -229,8 +254,14 @@ function updateState(deltaT, elapsedT) {
     }
     else {
         // gravity
-        rate = [rate[0] + 1 * -0.004,
-        rate[1] + 0 * -0.004]
+        const [gvX, gvY] = calculateChangeInPosition(position, 10, deltaT)
+        // console.log(gvX, gvY)
+        if (gvX) {
+            rate = [rate[0] + gvX, rate[1]]
+        }
+        if (gvY) {
+            rate = [rate[0], rate[1] + gvY]
+        }
     }
 
     drawScene(deltaT, elapsedT);
@@ -318,7 +349,6 @@ function handleKeyDown(event) {
         thrustOff(event)
         return
     }
-    console.log(event.keyCode)
     if (event.keyCode === 13) {
         resetSpace(event)
         return

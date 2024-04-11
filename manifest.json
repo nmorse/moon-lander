@@ -1,7 +1,7 @@
 {
-    "name": "mass times acceleration equals force",
-    "short_name": "maf",
-    "description": "Control your capsule's thrusters to navigate a space-time anomaly",
+    "name": "moon-simulator",
+    "short_name": "moon-sim",
+    "description": "Control your capsule's thrusters to land on a moon",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#111",
