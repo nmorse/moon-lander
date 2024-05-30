@@ -34,7 +34,30 @@ const resetSpace = () => {
     position = [0.0, 0.0]
 }
 
-// Initialize the moon surface
+function getAngle(src, target) {
+    const deltaX = target[0] - src[0]
+    const deltaY = target[1] - src[1]
+    // console.log(deltaX, deltaY)
+    const angle = Math.atan2(deltaY, deltaX)
+    if (angle < 0) {
+        return angle + 2 * Math.PI
+    }
+    return angle
+}
+
+// function rand(seed) {
+//     // var seed = Date.now();
+//     let m_w = 123456789;
+//     let m_z = 987654321;
+//     const mask = 0xffffffff;
+//     m_w = (123456789 + seed) & mask;
+//     m_z = (987654321 - seed) & mask;
+//     return function() {
+//         m_z = (36969 * (m_z & 65535) + (m_z >> 16)) & mask;
+//         m_w = (18000 * (m_w & 65535) + (m_w >> 16)) & mask;
+//         return (((m_z << 16) + (m_w & 65535)) >>> 0) / 5000000000;
+//     }
+// }
 
 function drawScene(deltaT, elapsedT) {
     ctx.save();
@@ -70,6 +93,28 @@ function drawScene(deltaT, elapsedT) {
     ctx.beginPath();
     ctx.arc(2300, 0, 2000, 0, 2 * Math.PI);
     ctx.fill();
+    // draw moon craters
+    ctx.strokeStyle = 'rgb(0,0,0)'
+    const angle_to_craft = getAngle([-2300, 0], position)
+    // console.log(angle_to_craft)
+    let angle = angle_to_craft - 0.5
+    const noiseScale = 0.1
+    const radius = 1981
+    while(angle < angle_to_craft + 1) {
+        var x = Math.sin(angle) * radius;
+        var y = Math.cos(angle) * radius;
+
+        // Use Perlin noise to add bumps to the circle
+        var noiseValue = perlin(x * noiseScale, y * noiseScale);
+        var height = radius + noiseValue * 90; // Adjust the amplitude of the bumps here
+
+        console.log(angle, height)
+
+        ctx.beginPath();
+        ctx.arc(-2300, 0, height, angle-0.03, angle+0.03);
+        ctx.stroke();
+        angle += 0.1
+    }
 
     ctx.restore();
     // draw the Vessel
